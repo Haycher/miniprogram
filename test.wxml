@@ -1,0 +1,9 @@
+<view class="swiper_wrapper">
+  <view class="swiper_box" style="{{swiper.boxStyle}}" bindtouchstart="touchstart" bindtouchmove="touchmove" bindtouchend="touchend">
+    <view class="swiper_item" style="{{swiper.styleArr[index]}}" wx:for="{{randerData}}">
+      <view class="item">
+        {{item}}
+      </view>
+    </view>
+  </view>
+</view>
