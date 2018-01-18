@@ -2,12 +2,12 @@
   小程序放大幻灯片循环组件
   幻灯片个数不得少于5个，对于少于5个的情况需要手动复制幻灯片让其数量达到5个以上
   同一页面可以存在多个幻灯片
-  version 1.0.0
-  By HaichunLyu 2018/01/17
+  version 1.0.1
+  By HaichunLyu 2018/01/18
 
   使用规范：
   
-  const swiper = require("../../utils/swiper.scale.js")
+  const swiper = require("../../utils/ft.scale.swiper.js")
   var mySwiper;
   Page({
     data: {
@@ -21,24 +21,15 @@
       randerData: [1,2,3,4,5,6]
     },
     onLoad: function () {
-      mySwiper = new swiper.ScaleSwiper('swiper', this);//初始化幻灯片，将对应setting参数名和this传入
-    },
-    touchstart: function(evt){
-      mySwiper.touchstart(evt);
-    },
-    touchmove: function(evt){
-      mySwiper.touchmove(evt);
-    },
-    touchend: function(evt){
-      mySwiper.touchend(evt, function(){
-        console.log(mySwiper.index);//当前幻灯片索引
+      mySwiper = new swiper.ScaleSwiper('swiper', this, function(){//初始化幻灯片，将对应setting参数名(this.data.参数名)、this、callback(可不传) 传入
+        console.log(this.index);
       });
     }
   })
 
   wxml文件结构使用方案：
-  <view class="swiper_wrapper">
-    <view class="swiper_box" style="{{swiper.boxStyle}}" bindtouchstart="touchstart" bindtouchmove="touchmove" bindtouchend="touchend">
+  <view class="swiper_outer">
+    <view class="swiper_box" style="{{swiper.boxStyle}}" bindtouchstart="{{swiper.touchstart}}" bindtouchmove="{{swiper.touchmove}}" bindtouchend="{{swiper.touchend}}">
       <view class="swiper_item" style="{{swiper.styleArr[index]}}" wx:for="{{randerData}}">
         <view class="item">
           {{item}}
@@ -48,7 +39,7 @@
   </view>
 
   wxss文件设定方案：
-  .swiper_wrapper{padding: 50rpx 0;overflow: hidden;}
+  .swiper_outer{padding: 50rpx 0;overflow: hidden;}
   .swiper_box{height: 90px;}
   .item{line-height: 90px;text-align: center;font-size: 30px;background-color: #eee;}
 */
@@ -58,7 +49,7 @@ module.exports = {
 
 var windowW = wx.getSystemInfoSync().windowWidth;
 
-function ScaleSwiper(swiperName, _this){//新起一个幻灯片
+function ScaleSwiper(swiperName, _this, callback){//新起一个幻灯片
   this.pageThis = _this;
   this.swiperName = swiperName;
   this.leftShow = 15;
@@ -67,6 +58,7 @@ function ScaleSwiper(swiperName, _this){//新起一个幻灯片
   this.index = 0;
   this.setting = _this.data[swiperName];
   this.number = this.setting.number;
+  this.callback = callback ? callback : function(){};
   this.initSwiper();
 }
 
@@ -85,6 +77,25 @@ ScaleSwiper.prototype.initSwiper = function() {
 ScaleSwiper.prototype.setPageData = function() {
   var data = {};
   data[this.swiperName + '.boxStyle'] = this.boxStyle;
+  data[this.swiperName + '.styleArr'] = this.styleArr;
+  data[this.swiperName + '.touchstart'] = this.swiperName + 'BindTouchstart';
+  data[this.swiperName + '.touchmove'] = this.swiperName + 'BindTouchmove';
+  data[this.swiperName + '.touchend'] = this.swiperName + 'BindTouchend';
+  var _this = this;
+  this.pageThis[this.swiperName + 'BindTouchstart'] = function(evt){
+    _this.touchstart(evt);
+  }
+  this.pageThis[this.swiperName + 'BindTouchmove'] = function(evt){
+    _this.touchmove(evt);
+  }
+  this.pageThis[this.swiperName + 'BindTouchend'] = function(evt){
+    _this.touchend(evt);
+  }
+  this.pageThis.setData(data);
+}
+
+ScaleSwiper.prototype.setSwiperData = function() {
+  var data = {};
   data[this.swiperName + '.styleArr'] = this.styleArr;
   this.pageThis.setData(data);
 }
@@ -105,7 +116,7 @@ ScaleSwiper.prototype.touchmove = function(evt) {
   }
   if (this.isSwiper) {//如果是左右滑动事件
     this.setStyleArr(false, moveX);
-    this.setPageData();
+    this.setSwiperData();
   }
 }
 
@@ -127,8 +138,8 @@ ScaleSwiper.prototype.touchend = function(evt, callback) {
     this.index = 0;
   }
   this.setStyleArr(true, 0);
-  this.setPageData();
-  if (callback) callback();//滑动事件结束回调
+  this.setSwiperData();
+  this.callback();//滑动事件结束触发
 }
 
 ScaleSwiper.prototype.setStyleArr = function(showTransition, moveX) {
