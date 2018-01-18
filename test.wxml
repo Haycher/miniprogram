@@ -1,5 +1,5 @@
-<view class="swiper_wrapper">
-  <view class="swiper_box" style="{{swiper.boxStyle}}" bindtouchstart="touchstart" bindtouchmove="touchmove" bindtouchend="touchend">
+<view class="swiper_outer">
+  <view class="swiper_box" style="{{swiper.boxStyle}}" bindtouchstart="{{swiper.touchstart}}" bindtouchmove="{{swiper.touchmove}}" bindtouchend="{{swiper.touchend}}">
     <view class="swiper_item" style="{{swiper.styleArr[index]}}" wx:for="{{randerData}}">
       <view class="item">
         {{item}}

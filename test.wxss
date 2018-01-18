@@ -1,13 +1,3 @@
-.swiper_wrapper{
-  padding: 50rpx 0;
-  overflow: hidden;
- }
-.swiper_box{
-  height: 90px;
-}
-.item{
-  line-height: 90px;
-  text-align: center;
-  font-size: 30px;
-  background-color: #eee;
-}
+.swiper_outer{padding: 50rpx 0;overflow: hidden;}
+.swiper_box{height: 90px;}
+.item{line-height: 90px;text-align: center;font-size: 30px;background-color: #eee;}
